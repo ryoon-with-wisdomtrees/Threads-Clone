@@ -19,6 +19,8 @@ import Image from "next/image";
 import { ChangeEvent, useState } from "react";
 import { Textarea } from "../ui/textarea";
 import { File } from "buffer";
+import { isBase64Image } from "@/lib/utils";
+import { useUploadThing } from "@/lib/uploadthing";
 interface Props {
   user: {
     id: string;
@@ -32,6 +34,7 @@ interface Props {
 }
 const AccoutProfile = ({ user, btnTitle }: Props) => {
   const [files, setFiles] = useState<File[]>([]);
+  const { startUpoad } = useUploadThing("media");
 
   const form = useForm({
     resolver: zodResolver(UserValidation),
@@ -66,11 +69,21 @@ const AccoutProfile = ({ user, btnTitle }: Props) => {
     }
   };
 
-  function onSubmit(values: z.infer<typeof UserValidation>) {
+  const onSubmit = async (values: z.infer<typeof UserValidation>) => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
+    const blob = values.profile_photo;
+    const hasImageChanged = isBase64Image(blob);
     console.log(values);
-  }
+    if (hasImageChanged) {
+      const imgRes = await startUpoad(files);
+      if (imgRes && imgRes[0].fileUrl) {
+        values.profile_photo = imgRes[0].fileUrl;
+      }
+    }
+
+    // 업데이트 유저프로필 백엔드 펑션 기술할 것임.
+  };
 
   return (
     <Form {...form}>
