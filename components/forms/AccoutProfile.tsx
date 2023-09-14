@@ -1,28 +1,28 @@
 "use client";
 
-import { Form } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { UserValidation } from "@/lib/validations/user";
 import {
+  Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "../ui/button";
+
+import { UserValidation } from "@/lib/validations/user";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
-import Image from "next/image";
-import { ChangeEvent, useState } from "react";
-import { Textarea } from "../ui/textarea";
-import { File } from "buffer";
-import { isBase64Image } from "@/lib/utils";
-import { useUploadThing } from "@/lib/uploadthing";
+
 import { updateUser } from "@/lib/actions/user.action";
+import { useUploadThing } from "@/lib/uploadthing";
+import { isBase64Image } from "@/lib/utils";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import { ChangeEvent, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "../ui/textarea";
 interface Props {
   user: {
     id: string;
@@ -36,17 +36,26 @@ interface Props {
 }
 const AccoutProfile = ({ user, btnTitle }: Props) => {
   const [files, setFiles] = useState<File[]>([]);
-  const startUpoad = useUploadThing("media");
+  const { startUpload } = useUploadThing("media");
   const router = useRouter();
   const pathname = usePathname();
 
-  const form = useForm({
+  // const form = useForm({
+  //   resolver: zodResolver(UserValidation),
+  //   defaultValues: {
+  //     profile_photo: user?.image || "",
+  //     name: user?.name || "",
+  //     username: user?.username || "",
+  //     bio: user?.bio || "",
+  //   },
+  // });
+  const form = useForm<z.infer<typeof UserValidation>>({
     resolver: zodResolver(UserValidation),
     defaultValues: {
-      profile_photo: user?.image || "",
-      name: user?.name || "",
-      username: user?.username || "",
-      bio: user?.bio || "",
+      profile_photo: user?.image ? user.image : "",
+      name: user?.name ? user.name : "",
+      username: user?.username ? user.username : "",
+      bio: user?.bio ? user.bio : "",
     },
   });
 
@@ -78,23 +87,29 @@ const AccoutProfile = ({ user, btnTitle }: Props) => {
     // ✅ This will be type-safe and validated.
     const blob = values.profile_photo;
     const hasImageChanged = isBase64Image(blob);
-    console.log(values);
+    // console.log(values);
     if (hasImageChanged) {
-      const imgRes = await startUpoad(files);
+      const imgRes = await startUpload(files);
       if (imgRes && imgRes[0].fileUrl) {
         values.profile_photo = imgRes[0].fileUrl;
       }
     }
 
     // 업데이트 유저프로필 백엔드 펑션 기술할 것임.
-    await updateUser(
-      values.username,
-      values.name,
-      values.bio,
-      values.profile_photo,
-      user.id,
-      pathname
-    );
+    await updateUser({
+      userId: user.id,
+      username: values.username,
+      name: values.name,
+      bio: values.bio,
+      image: values.profile_photo,
+      path: pathname,
+    });
+
+    if (pathname === "/profile/edit") {
+      router.back();
+    } else {
+      router.push("/");
+    }
   };
 
   return (
@@ -200,7 +215,7 @@ const AccoutProfile = ({ user, btnTitle }: Props) => {
           )}
         />
         <Button type="submit" className="bg-primary-500">
-          Submit
+          {btnTitle}
         </Button>
       </form>
     </Form>
