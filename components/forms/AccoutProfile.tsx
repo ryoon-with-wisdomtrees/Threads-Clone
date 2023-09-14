@@ -21,6 +21,8 @@ import { Textarea } from "../ui/textarea";
 import { File } from "buffer";
 import { isBase64Image } from "@/lib/utils";
 import { useUploadThing } from "@/lib/uploadthing";
+import { updateUser } from "@/lib/actions/user.action";
+import { usePathname, useRouter } from "next/navigation";
 interface Props {
   user: {
     id: string;
@@ -34,7 +36,9 @@ interface Props {
 }
 const AccoutProfile = ({ user, btnTitle }: Props) => {
   const [files, setFiles] = useState<File[]>([]);
-  const { startUpoad } = useUploadThing("media");
+  const startUpoad = useUploadThing("media");
+  const router = useRouter();
+  const pathname = usePathname();
 
   const form = useForm({
     resolver: zodResolver(UserValidation),
@@ -83,6 +87,14 @@ const AccoutProfile = ({ user, btnTitle }: Props) => {
     }
 
     // 업데이트 유저프로필 백엔드 펑션 기술할 것임.
+    await updateUser(
+      values.username,
+      values.name,
+      values.bio,
+      values.profile_photo,
+      user.id,
+      pathname
+    );
   };
 
   return (
