@@ -24,7 +24,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, useState } from "react";
 import { CommentValidation, ThreadValidation } from "@/lib/validations/thread";
-import { createThread } from "@/lib/actions/thread.actions";
+import { addCommentToThread, createThread } from "@/lib/actions/thread.actions";
 
 interface Props {
   threadId: string;
@@ -44,13 +44,14 @@ const Comment = ({ threadId, currentUserImg, currentUserId }: Props) => {
   });
 
   const onSubmit = async (values: z.infer<typeof CommentValidation>) => {
-    // await createThread({
-    //   text: values.thread,
-    //   author: currentUserId,
-    //   communityId: null,
-    //   path: pathname,
-    // });
-    router.push("/");
+    await addCommentToThread(
+      threadId,
+      values.thread,
+      JSON.parse(currentUserId),
+      pathname
+    );
+    form.reset();
+    // router.push("/");
   };
 
   return (
@@ -67,7 +68,7 @@ const Comment = ({ threadId, currentUserImg, currentUserId }: Props) => {
                   alt="Profile image"
                   width={48}
                   height={48}
-                  className="rounded-full object-cover"
+                  className="relative h-11 w-11h-11 w-11 rounded-full object-cover"
                 />
               </FormLabel>
               <FormControl className="border-none bg-transparent">

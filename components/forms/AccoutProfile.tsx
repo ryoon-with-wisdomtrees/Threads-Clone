@@ -83,6 +83,7 @@ const AccoutProfile = ({ user, btnTitle }: Props) => {
   };
 
   const onSubmit = async (values: z.infer<typeof UserValidation>) => {
+    console.log(`onSubmit==========================`);
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     const blob = values.profile_photo;
@@ -95,6 +96,7 @@ const AccoutProfile = ({ user, btnTitle }: Props) => {
       }
     }
 
+    console.log(`values: ${values}`);
     // 업데이트 유저프로필 백엔드 펑션 기술할 것임.
     await updateUser({
       userId: user.id,
