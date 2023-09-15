@@ -128,3 +128,30 @@ export async function fetchAllUsers({
     throw new Error(`Failed to fetch user: ${error.message}`);
   }
 }
+
+export async function getActivity(userId: string) {
+  try {
+    connectToDB();
+    // 내가쓴 스레드 모두 보기~!
+    const allMyThreads = await Thread.find({ author: userId });
+
+    // Collect all the child thread ids(replies 댓글) from the 'children' field
+    const childThreadIds = allMyThreads.reduce((acc, allMyThread) => {
+      return acc.concat(allMyThread.children);
+    }, []);
+
+    //find all the threads that user has replied to
+    const replies = await Thread.find({
+      _id: { $in: childThreadIds },
+      author: { $ne: userId },
+    }).populate({
+      path: "author",
+      model: User,
+      select: "name image _id",
+    });
+
+    return replies;
+  } catch (error: any) {
+    throw new Error(`error: ${error.message}`);
+  }
+}
