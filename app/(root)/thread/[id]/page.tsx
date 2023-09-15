@@ -36,7 +36,7 @@ const page = async ({ params }: { params: { id: string } }) => {
         <Comment
           threadId={thread.id}
           currentUserImg={userInfo.image}
-          currentUserId={JSON.stringify(userInfo._id)}
+          currentUserId={userInfo._id}
         />
       </div>
       <div className="mt-10">
