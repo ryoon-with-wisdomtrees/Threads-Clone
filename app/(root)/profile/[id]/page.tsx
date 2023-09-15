@@ -7,7 +7,7 @@ import { currentUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
-async function Page({ params }: { params: { id: string } }) {
+async function page({ params }: { params: { id: string } }) {
   const user = await currentUser();
   if (!user) return null;
 
@@ -66,4 +66,4 @@ async function Page({ params }: { params: { id: string } }) {
   );
 }
 
-export default Page;
+export default page;

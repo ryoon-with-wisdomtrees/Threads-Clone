@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import User from "../models/user.model";
 import { connectToDB } from "../mongoose";
 import Thread from "../models/thread.model";
+import { FilterQuery, SortOrder } from "mongoose";
 
 // Destructuring하기 위한 인터페이스 Params
 // 데이터를 넘겨주는 쪽에서 어떤 순서로 넘겨줘도 name으로 맵핑되기 때문에 less error하게 된다.
@@ -78,6 +79,51 @@ export async function fetchUserPosts(userId: string) {
 
     return threads;
     //TODO populate COmmunity
+  } catch (error: any) {
+    throw new Error(`Failed to fetch user: ${error.message}`);
+  }
+}
+
+export async function fetchAllUsers({
+  userId,
+  pageNumber = 1,
+  pageSize = 0,
+  searchString = "",
+  sortBy = "desc",
+}: {
+  userId: string;
+  pageNumber?: number;
+  pageSize?: number;
+  searchString?: string;
+  sortBy?: SortOrder; //from 몽고디비   -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
+}) {
+  try {
+    connectToDB();
+
+    const skipAmount = (pageNumber - 1) * pageSize;
+    const regex = new RegExp(searchString, "i");
+    const query: FilterQuery<typeof User> = {
+      id: { $ne: userId },
+    };
+
+    if (searchString.trim() !== "") {
+      query.$or = [
+        { username: { $regex: regex } },
+        { name: { $regex: regex } },
+      ];
+    }
+
+    const sortOption = { createdAt: sortBy };
+    const usersQuery = User.find(query)
+      .sort(sortOption)
+      .skip(skipAmount)
+      .limit(pageSize);
+
+    const totalUsersCnt = await User.countDocuments(query);
+
+    const users = await usersQuery.exec();
+    const isNext = totalUsersCnt > skipAmount + users.length;
+    return { users, isNext };
   } catch (error: any) {
     throw new Error(`Failed to fetch user: ${error.message}`);
   }

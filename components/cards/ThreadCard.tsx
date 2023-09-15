@@ -50,6 +50,7 @@ const ThreadCard = ({
               <Image
                 src={author.image}
                 alt="profile_pic"
+                // style={{ height: "2.75rem", width: "2.75rem" }}
                 fill
                 className="cursor-pointer rounded-full"
               />
