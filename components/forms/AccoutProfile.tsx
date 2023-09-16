@@ -105,6 +105,7 @@ const AccoutProfile = ({ user, btnTitle }: Props) => {
       userId: user.id,
       bio: values.bio,
       image: values.profile_photo,
+      onboarded: true,
     });
 
     if (pathname === "/profile/edit") {

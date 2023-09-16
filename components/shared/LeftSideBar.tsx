@@ -1,7 +1,7 @@
 "use client"; // useRouter는 온리 client side에 적용됨으로 해당 사항 적시해줘야 함.
 // 이것은 client side rendered component라는 표기임.
 import { sidebarLinks } from "@/constants";
-import { SignOutButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { SignOutButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -39,6 +39,7 @@ const LeftSideBar = () => {
       </div>
       <div className="mt-10 px-6">
         <SignedIn>
+          {/* <UserButton /> */}
           <SignOutButton
             signOutCallback={() => {
               router.push("/sign-in");

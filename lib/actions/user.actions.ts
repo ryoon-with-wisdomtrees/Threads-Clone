@@ -16,6 +16,7 @@ interface Params {
   bio: string;
   image: string;
   path: string;
+  onboarded: boolean;
 }
 
 export async function updateUser({
@@ -25,6 +26,7 @@ export async function updateUser({
   bio,
   image,
   path,
+  onboarded,
 }: Params): Promise<void> {
   connectToDB();
   try {
@@ -35,7 +37,7 @@ export async function updateUser({
         name,
         bio,
         image,
-        onboarded: true,
+        onboarded,
       },
       { upsert: true }
     );

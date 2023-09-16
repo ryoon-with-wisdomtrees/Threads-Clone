@@ -13,9 +13,10 @@ async function Home({
   searchParams: { [key: string]: string | undefined };
 }) {
   const user = await currentUser();
-  if (!user) return redirect("/sign-in");
-
+  // if (!user) return null;
+  if (!user) redirect("/sign-in");
   const userInfo = await fetchUser(user.id);
+  console.log(`userInfo::::::::`, userInfo);
   if (!userInfo?.onboarded) redirect("/onboarding");
 
   const result = await fetchPosts(
