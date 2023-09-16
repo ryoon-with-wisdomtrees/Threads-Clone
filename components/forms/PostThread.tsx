@@ -39,7 +39,7 @@ interface Props {
 }
 
 const PostThread = ({ userId }: { userId: string }) => {
-  console.log(`유저아이디: ${userId}`);
+  // console.log(`유저아이디: ${userId}`);
   const router = useRouter();
   const pathname = usePathname();
   const { organization } = useOrganization();
@@ -53,6 +53,7 @@ const PostThread = ({ userId }: { userId: string }) => {
   });
 
   const onSubmit = async (values: z.infer<typeof ThreadValidation>) => {
+    console.log("ORG_ID: ", organization?.id);
     await createThread({
       text: values.thread,
       author: userId,

@@ -9,6 +9,7 @@ import { revalidatePath } from "next/cache";
 import Thread from "../models/thread.model";
 import User from "../models/user.model";
 import { connectToDB } from "../mongoose";
+import Community from "../models/community.model";
 
 interface Params {
   text: string;
@@ -26,10 +27,16 @@ export async function createThread({
   console.log(`author: ${author}`);
   try {
     connectToDB();
+
+    const communityIdObject = await Community.findOne(
+      { id: communityId },
+      { _id: 1 }
+    );
+
     const createdThread = await Thread.create({
       text,
       author,
-      community: null,
+      community: communityIdObject,
     });
 
     //업데이트 유저모델. 스레드작성과 동시에 누가 그 스레드 작성했는지 기록
@@ -38,6 +45,13 @@ export async function createThread({
         threads: createdThread._id,
       },
     });
+
+    if (communityIdObject) {
+      // Update Community model
+      await Community.findByIdAndUpdate(communityIdObject, {
+        $push: { threads: createdThread._id },
+      });
+    }
 
     revalidatePath(path);
   } catch (error: any) {
@@ -57,6 +71,10 @@ export async function fetchPosts(pageNumber = 1, pageSize = 20) {
     .skip(skipAmount)
     .limit(pageSize)
     .populate({ path: "author", model: User })
+    .populate({
+      path: "community",
+      model: Community,
+    })
     .populate({
       path: "children",
       populate: {
@@ -149,3 +167,5 @@ export async function addCommentToThread(
     throw new Error(`Error fetching thread: ${error.message}`);
   }
 }
+
+export async function deleteThread(id: string, path: string): Promise<void> {}

@@ -5,6 +5,7 @@ import User from "../models/user.model";
 import { connectToDB } from "../mongoose";
 import Thread from "../models/thread.model";
 import { FilterQuery, SortOrder } from "mongoose";
+import Community from "../models/community.model";
 
 // Destructuring하기 위한 인터페이스 Params
 // 데이터를 넘겨주는 쪽에서 어떤 순서로 넘겨줘도 name으로 맵핑되기 때문에 less error하게 된다.
@@ -49,11 +50,10 @@ export async function updateUser({
 export async function fetchUser(userId: string) {
   try {
     connectToDB();
-    return await User.findOne({ id: userId });
-    // .populate({
-    //   path:'communities',
-    //   model:Community
-    // })
+    return await User.findOne({ id: userId }).populate({
+      path: "communities",
+      model: Community,
+    });
   } catch (error: any) {
     throw new Error(`Failed to fetch user: ${error.message}`);
   }
@@ -66,15 +66,22 @@ export async function fetchUserPosts(userId: string) {
     const threads = await User.findOne({ id: userId }).populate({
       path: "threads",
       model: Thread,
-      populate: {
-        path: "children",
-        model: Thread,
-        populate: {
-          path: "author",
-          model: User,
-          select: "name username image id",
+      populate: [
+        {
+          path: "community",
+          model: Community,
+          select: "name id image _id", // Select the "name" and "_id" fields from the "Community" model
         },
-      },
+        {
+          path: "children",
+          model: Thread,
+          populate: {
+            path: "author",
+            model: User,
+            select: "name username image id",
+          },
+        },
+      ],
     });
 
     return threads;
