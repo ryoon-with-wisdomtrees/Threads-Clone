@@ -2,7 +2,7 @@ import {
   fetchAllUsers,
   fetchUser,
   getActivity,
-} from "@/lib/actions/user.action";
+} from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
