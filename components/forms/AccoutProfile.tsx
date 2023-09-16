@@ -99,12 +99,12 @@ const AccoutProfile = ({ user, btnTitle }: Props) => {
     console.log(`values: ${values}`);
     // 업데이트 유저프로필 백엔드 펑션 기술할 것임.
     await updateUser({
-      userId: user.id,
-      username: values.username,
       name: values.name,
+      path: pathname,
+      username: values.username,
+      userId: user.id,
       bio: values.bio,
       image: values.profile_photo,
-      path: pathname,
     });
 
     if (pathname === "/profile/edit") {

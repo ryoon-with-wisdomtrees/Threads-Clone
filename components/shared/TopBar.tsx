@@ -1,9 +1,17 @@
-import { OrganizationSwitcher, SignedIn, SignedOut } from "@clerk/nextjs";
+import {
+  OrganizationSwitcher,
+  SignedIn,
+  SignedOut,
+  useUser,
+} from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { dark } from "@clerk/themes";
-import { Clerk } from "@clerk/nextjs/server";
+
 const TopBar = () => {
+  // const temopUser = useUser();
+  // console.log("temopUser: ", temopUser);
+
   return (
     <nav className="topbar">
       <Link href="/" className="flex items-center gap-4">
@@ -26,10 +34,13 @@ const TopBar = () => {
           </SignedIn>
         </div>
         <OrganizationSwitcher
+          // organizationProfileMode={"navigation"}
+          hidePersonal={false}
           appearance={{
             baseTheme: dark,
             elements: {
               organizationSwitcherTrigger: "py-2 px-4",
+              // avatarImage:
             },
           }}
         />
